@@ -67,21 +67,16 @@ public class ChatMessageServer {
 
                 // 检查客户端是否发送了SDME命令
                 String command = in.readLine();
-                if (command != null && command.equals("SDME")) {
-                    // 读取下一个消息内容
-                    String messageToSend = in.readLine();
-                    if (messageToSend != null) {
-                        try {
-                            // 调用sendMessage方法
-                            ChatforwardClient.sendMessage(messageToSend);
-                            out.println("ACK: Message sent successfully"); // 成功确认
-                            logger.info("Processed SDME command with message: " + messageToSend);
-                        } catch (Exception e) {
-                            out.println("ERROR: Failed to send message - " + e.getMessage()); // 错误响应
-                            logger.warning("Failed to process SDME command: " + e);
-                        }
-                    } else {
-                        out.println("ERROR: No message content provided after SDME command");
+                if (command != null && command.startsWith("SDME")) {
+                    String messageToSend = command.substring(5);
+                    try {
+                        // 调用sendMessage方法
+                        ChatforwardClient.sendMessage(messageToSend);
+                        out.println("ACK"); // 成功确认
+                        logger.info("Processed SDME command with message: " + messageToSend);
+                    } catch (Exception e) {
+                        out.println("ERROR: Failed to send message - " + e.getMessage()); // 错误响应
+                        logger.warning("Failed to process SDME command: " + e);
                     }
                     return; // 结束此连接
                 } else if (command != null) {

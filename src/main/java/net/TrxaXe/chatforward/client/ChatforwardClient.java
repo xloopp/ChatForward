@@ -32,7 +32,7 @@ public class ChatforwardClient implements ClientModInitializer {
 
         ClientCommandRegistrationCallback.EVENT.register((dispatcher, registryAccess) -> {
             LiteralCommandNode<FabricClientCommandSource> ChatforwardNode = ClientCommandManager
-                    .literal("Chatforward")
+                    .literal("chatforward")
                     .executes(context -> {
                         String Feedback;
                         if (running.get()) {
@@ -40,7 +40,7 @@ public class ChatforwardClient implements ClientModInitializer {
                             Feedback = "Forward stopped";
                         } else {
                             startServer();
-                            Feedback = "Forward started at"+ port;
+                            Feedback = "Forward started at "+ port;
                         }
                         context.getSource().sendFeedback(Text.literal(Feedback));
                         return 1;
@@ -51,7 +51,7 @@ public class ChatforwardClient implements ClientModInitializer {
                     .literal("status")
                     .executes(context -> {
                         context.getSource().sendFeedback(Text.literal(
-                                "Chat Forward is " + (!running.get() ? "stop" : ("running at port: " + port)))
+                                "Chat forward is " + (!running.get() ? "stop" : ("running at port: " + port)))
                         );
                         return 1;
                     })
@@ -59,12 +59,12 @@ public class ChatforwardClient implements ClientModInitializer {
 
             LiteralCommandNode<FabricClientCommandSource> PortNode = ClientCommandManager
                     .literal("port")
-                    .then(ClientCommandManager.argument("Port", IntegerArgumentType.integer(0,65536)))
-                    .executes(context -> {
-                        port = IntegerArgumentType.getInteger(context, "Port");
-                        context.getSource().sendFeedback(Text.literal("Now port is:" + port));
-                        return 1;
-                    })
+                    .then(ClientCommandManager.argument("Port", IntegerArgumentType.integer(1,65535))
+                            .executes(context -> {
+                                port = IntegerArgumentType.getInteger(context, "Port");
+                                context.getSource().sendFeedback(Text.literal("Now port is: " + port));
+                                return 1;
+                            }))
                     .build();
             ChatforwardNode.addChild(StatusNode);
             ChatforwardNode.addChild(PortNode);
@@ -72,6 +72,6 @@ public class ChatforwardClient implements ClientModInitializer {
         });
     }
     public static void sendMessage(String string) {
-        player.sendMessage(Text.literal(string),false);
+        player.sendMessage(Text.literal(string),true);
     }
 }
