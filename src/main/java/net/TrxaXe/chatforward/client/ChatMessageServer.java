@@ -126,9 +126,6 @@ public class ChatMessageServer {
             }
         }
     }
-    private void serverCommandHandle() {
-
-    }
 
     public static void stopServer() {
         if (!running.getAndSet(false)) return; // 已经关闭
