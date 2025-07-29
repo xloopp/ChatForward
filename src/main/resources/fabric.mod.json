@@ -1,0 +1,28 @@
+{
+  "schemaVersion": 1,
+  "id": "chatforward",
+  "version": "${version}",
+  "name": "ChatForward",
+  "description": "",
+  "authors": [],
+  "contact": {},
+  "license": "All-Rights-Reserved",
+  "icon": "assets/chatforward/icon.png",
+  "environment": "client",
+  "entrypoints": {
+    "client": [
+      "net.TrxaXe.chatforward.client.ChatforwardClient"
+    ],
+    "main": [
+      "net.TrxaXe.chatforward.Chatforward"
+    ]
+  },
+  "mixins": [
+    "chatforward.mixins.json"
+  ],
+  "depends": {
+    "fabricloader": ">=${loader_version}",
+    "fabric": "*",
+    "minecraft": "${minecraft_version}"
+  }
+}
