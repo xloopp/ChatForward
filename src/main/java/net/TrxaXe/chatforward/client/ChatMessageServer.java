@@ -65,24 +65,6 @@ public class ChatMessageServer {
             try {
                 clientSocket.setSoTimeout(5000); // 设置读取命令超时
 
-                // 检查客户端是否发送了SDME命令
-                String command = in.readLine();
-                if (command != null && command.startsWith("SDME")) {
-                    String messageToSend = command.substring(5);
-                    try {
-                        // 调用sendMessage方法
-                        ChatforwardClient.sendMessage(messageToSend);
-                        out.println("ACK"); // 成功确认
-                        logger.info("Processed SDME command with message: " + messageToSend);
-                    } catch (Exception e) {
-                        out.println("ERROR: Failed to send message - " + e.getMessage()); // 错误响应
-                        logger.warning("Failed to process SDME command: " + e);
-                    }
-                    return; // 结束此连接
-                } else if (command != null) {
-                    out.println("ERROR: Unsupported command");
-                    return;
-                }
                 // 1. 发送全部历史消息
                 for (String pastMessage : messageHistory) {
                     out.println(pastMessage);
@@ -100,9 +82,25 @@ public class ChatMessageServer {
                     out.println(message);
                     clientSocket.setSoTimeout(3000);
                     String ack = in.readLine();
-                    if (ack == null || !ack.equals("ACK")) {
+                    if (ack == null) {
                         logger.warning("客户端未确认消息: " + message);
                         break; // 断开连接
+                    } else {
+                        logger.info(ack);
+                        if (ack.startsWith("SDME")) {
+                            String messageToSend = ack.substring(5);
+                            try {
+                                // 调用sendMessage方法
+                                ChatforwardClient.sendMessage(messageToSend);
+                                out.println("ACK"); // 成功确认
+                                logger.info("Processed SDME command with message: " + messageToSend);
+                            } catch (Exception e) {
+                                out.println("ERROR: Failed to send message - " + e.getMessage()); // 错误响应
+                                logger.warning("Failed to process SDME command: " + e);
+                            }
+                        } else {
+                            out.println("ERROR: Unsupported command");
+                        }
                     }
                 }
             } catch (SocketTimeoutException e) {
@@ -125,6 +123,7 @@ public class ChatMessageServer {
             }
         }
     }
+
 
     public static void stopServer() {
         if (!running.getAndSet(false)) return; // 已经关闭
