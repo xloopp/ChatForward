@@ -63,6 +63,31 @@ public class ChatMessageServer {
              BufferedReader in = new BufferedReader(new InputStreamReader(clientSocket.getInputStream(), StandardCharsets.UTF_8))
         ) {
             try {
+                clientSocket.setSoTimeout(5000); // 设置读取命令超时
+
+                // 检查客户端是否发送了SDME命令
+                String command = in.readLine();
+                if (command != null && command.equals("SDME")) {
+                    // 读取下一个消息内容
+                    String messageToSend = in.readLine();
+                    if (messageToSend != null) {
+                        try {
+                            // 调用sendMessage方法
+                            ChatforwardClient.sendMessage(messageToSend);
+                            out.println("ACK: Message sent successfully"); // 成功确认
+                            logger.info("Processed SDME command with message: " + messageToSend);
+                        } catch (Exception e) {
+                            out.println("ERROR: Failed to send message - " + e.getMessage()); // 错误响应
+                            logger.warning("Failed to process SDME command: " + e);
+                        }
+                    } else {
+                        out.println("ERROR: No message content provided after SDME command");
+                    }
+                    return; // 结束此连接
+                } else if (command != null) {
+                    out.println("ERROR: Unsupported command");
+                    return;
+                }
                 // 1. 发送全部历史消息
                 for (String pastMessage : messageHistory) {
                     out.println(pastMessage);

@@ -7,6 +7,8 @@ import net.fabricmc.fabric.api.client.command.v2.ClientCommandManager;
 import net.fabricmc.fabric.api.client.command.v2.ClientCommandRegistrationCallback;
 import net.fabricmc.fabric.api.client.command.v2.FabricClientCommandSource;
 import net.fabricmc.fabric.api.client.message.v1.ClientReceiveMessageEvents;
+import net.minecraft.client.MinecraftClient;
+import net.minecraft.client.network.ClientPlayerEntity;
 import net.minecraft.text.Text;
 
 import java.util.logging.Logger;
@@ -15,10 +17,12 @@ import static net.TrxaXe.chatforward.client.ChatMessageServer.*;
 
 public class ChatforwardClient implements ClientModInitializer {
     public static final Logger logger = Logger.getLogger("ChatForward");
+    public static ClientPlayerEntity player;
     public static int port = 8081;
     @Override
     public void onInitializeClient() {
-        startServer();
+        MinecraftClient Client = MinecraftClient.getInstance();
+        player = Client.player;
 
         ClientReceiveMessageEvents.GAME.register((message, overlay) -> {
             if (running.get()) {
@@ -66,5 +70,8 @@ public class ChatforwardClient implements ClientModInitializer {
             ChatforwardNode.addChild(PortNode);
             dispatcher.getRoot().addChild(ChatforwardNode);
         });
+    }
+    public static void sendMessage(String string) {
+        player.sendMessage(Text.literal(string),false);
     }
 }
